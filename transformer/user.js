@@ -18,11 +18,11 @@ MongoClient.connect(url, function(err, db) {
         //console.log(transformedUsers)
         collection.insertMany(transformedUsers).then(succ => {
             console.log(succ);
-            db.close()
+            db.close();
         }).catch(err => {
-            db.close()
+            db.close();
             console.error(err);
-        })
+        });
 
         //console.log(packageObj) // => 0.1.3
     });
