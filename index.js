@@ -9,7 +9,7 @@ const wsMessages = fs.createWriteStream('./olddata/messages.json');
 const wsUsers = fs.createWriteStream('./olddata/users.json');
 const wsConversations = fs.createWriteStream('./olddata/conversations.json');
 const wsSchoenhiers = fs.createWriteStream('./olddata/schoenhiers.json');
-const wsImage = fs.createWriteStream('./image.jpeg');
+//const wsImage = fs.createWriteStream('./image.jpeg');
 
 
 const allData = require('./allData.json');
@@ -98,7 +98,7 @@ wsSchoenhiers.write(JSON.stringify(schoenhiers));
 wsSchoenhiers.end();
 
 
-request.get('https://locator-app.com/api/v1/locations/90dd0bb7f23c628dddf94ba236ed5e25/supertrip.jpeg').pipe(wsImage)
+//request.get('https://locator-app.com/api/v1/locations/90dd0bb7f23c628dddf94ba236ed5e25/supertrip.jpeg').pipe(wsImage)
 
 console.timeEnd('locations filter');
 console.log('locations:', locations.length);
