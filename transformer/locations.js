@@ -6,6 +6,9 @@ const Grid = require('gridfs-stream');
 const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 
+const sanitize = require("sanitize-filename");
+
+
 var databaseInstance = {};
 
 const url = 'mongodb://localhost:27017/locator';
@@ -39,54 +42,101 @@ MongoClient.connect(url, function (err, db) {
 });
 
 
-function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
+var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
 
-    let user = arr[idx];
+    let location = arr[idx];
 
-    console.log('user.picture:', user.picture);
+    //console.log('user.title:', user);
+    let filenameFromTitle = replaceIllegalChars(sanitize(location.title));
+    console.log('inserting:', filenameFromTitle);
 
-    let imgPath = user.picture || '';
-    if (!imgPath.length || imgPath.startsWith('http')) {
+    let base = location.images.picture || '';
+    let xlargePath = '';
+    let largePath = '';
+    let midPath = '';
+    let smallPath = '';
+    let ext = '';
+    if (!base.length || base.startsWith('http')) {
         console.log('skipping, no image to upload');
         idx++;
         return insertImageAndDecorateObject(arr, idx, maxlength, callback);
 
     } else {
-        // TODO use maximum image size
-        imgPath = 'https://locator-app.com' + user.picture + '';
+        let basePath = 'https://locator-app.com' + base;
+        xlargePath = basePath + '?size=max';
+        largePath = basePath + '?size=mid';
+        midPath = basePath + '?size=small';
+        smallPath = basePath + '?size=mobileThumb';
+        ext = location.images.picture.split('.')[1];
     }
 
-    console.log('streaming img:', imgPath);
+    console.log('streaming img:', xlargePath);
 
 
     let gfs = Grid(databaseInstance, mongo);
 
     let writestream = gfs.createWriteStream({
-        filename: 'profile.jpeg'
+        filename: filenameFromTitle + '.' + ext
     });
-    request.get(imgPath).pipe(writestream);
+
+    // get normal picture
+    request.get(xlargePath).pipe(writestream);
 
 
-    writestream.on('close', function (file) {
+    writestream.on('close', file => {
         // do something with `file`
-        console.log('fileid', file._id);
-        arr[idx].picture = '/api/v1/users/' + file._id + '/profile.jpeg';
-        if (idx >= maxlength - 1) {
-            console.log('done with streaming');
-            return callback(arr);
-        }
-        idx++;
-        return insertImageAndDecorateObject(arr, idx, maxlength, callback);
+        console.log('xlarge streamed successful', file._id);
+        arr[idx].images.xlarge = '/api/v1/locations/' + file._id + '/'+ filenameFromTitle + ext;
+
+
+        // stream thumbnail picture
+        let largewritestream = gfs.createWriteStream({
+            filename: filenameFromTitle + '.' + ext
+        });
+        request.get(largePath).pipe(largewritestream);
+
+
+        largewritestream.on('close', file => {
+            console.log('large streamed successful', file._id);
+
+            arr[idx].images.large = '/api/v1/locations/' + file._id + '/' + filenameFromTitle + ext;
+
+            if (idx >= maxlength - 1) {
+                console.log('done with streaming');
+                return callback(arr);
+            }
+            idx++;
+            return insertImageAndDecorateObject(arr, idx, maxlength, callback);
+        });
+
+        largewritestream.on('error', err => {
+            console.log('Error streaming thumb in database', err);
+            throw err;
+        });
     });
 
 
-    writestream.on('error', function (file) {
-        console.log('An error occurred!', err);
+    writestream.on('error', err => {
+        console.log('Error streaming picture in database', err);
         throw err;
     });
 
-}
+};
 
+function replaceIllegalChars(string)
+{
+    let value = string.toLowerCase();
+    value = value.replace(/ä/g, 'ae');
+    value = value.replace(/ö/g, 'oe');
+    value = value.replace(/ü/g, 'ue');
+    value = value.replace(/ß/g, 'ss');
+    value = value.replace(/&/g, 'und');
+    value = value.replace(/'/g, '');
+    value = value.replace(/\(/g, '_');
+    value = value.replace(/\)/g, '_');
+    value = value.replace(/ /g, '_');
+    return value + '.';
+}
 /*
     let location = {
         "_id": "012bb2568b1842959293402b06c98e15",
