@@ -17,7 +17,9 @@ const allData = require('./allData.json');
 console.log('total elements', allData.total_rows);
 //console.log(allData.rows[0]);
 console.time('locations filter');
-wsLocations.on('error', function(err) { console.error(err); });
+wsLocations.on('error', err => {
+    console.error(err);
+});
 const locations = allData.rows.filter(elem => {
     let loc = elem.doc;
     return loc.type === 'location' && !loc.preLocation;
@@ -41,8 +43,7 @@ const trips = allData.rows.filter(elem => {
 
 const messages = allData.rows.filter(elem => {
     let mess = elem.doc;
-    return mess.type === 'message' && !mess.message.startsWith('Herzlich Willkommen im Chat von Locator') &&
-        !mess.message.startsWith('Übrigens:') && !mess.message.startsWith('Wenn du uns Feedback');
+    return mess.type === 'message' && !mess.message.startsWith('Herzlich Willkommen im Chat von Locator') && !mess.message.startsWith('Übrigens:') && !mess.message.startsWith('Wenn du uns Feedback');
 }).map(elem => {
     return elem.doc;
 });
@@ -76,7 +77,6 @@ const designDocs = allData.rows.filter(elem => {
 }).map(elem => {
     return elem.doc;
 });
-
 
 
 wsLocations.write(JSON.stringify(locations));
