@@ -51,12 +51,6 @@ function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
 
     console.log('user.picture:', user.picture);
 
-    let gfs = Grid(databaseInstance, mongo);
-
-    let writestream = gfs.createWriteStream({
-        filename: 'profile.jpeg'
-    });
-
     let imgPath = user.picture || '';
     if (!imgPath.length || imgPath.startsWith('http')) {
         console.log('skipping, no image to upload');
@@ -70,6 +64,12 @@ function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
 
     console.log('streaming img:', imgPath);
 
+
+    let gfs = Grid(databaseInstance, mongo);
+
+    let writestream = gfs.createWriteStream({
+        filename: 'profile.jpeg'
+    });
     request.get(imgPath).pipe(writestream);
 
 
