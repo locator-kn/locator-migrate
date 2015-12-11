@@ -8,7 +8,7 @@ const MongoClient = require('mongodb').MongoClient;
 
 var databaseInstance = {};
 
-const url = 'mongodb://localhost:27017/test22';
+const url = 'mongodb://localhost:27017/locator';
 
 MongoClient.connect(url, function(err, db) {
     databaseInstance = db;
