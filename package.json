@@ -1,0 +1,26 @@
+{
+  "name": "locator-migrate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "fs-extra": "^0.26.2",
+    "gridfs-stream": "^1.1.1",
+    "mongodb": "^2.1.0",
+    "request": "^2.67.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/locator-kn/locator-migrate.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/locator-kn/locator-migrate/issues"
+  },
+  "homepage": "https://github.com/locator-kn/locator-migrate#readme"
+}
