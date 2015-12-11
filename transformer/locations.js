@@ -29,7 +29,10 @@ MongoClient.connect(url, function (err, db) {
         });
 
         insertImageAndDecorateObject(packageObj, 0, packageObj.length, newLocations => {
-
+            newLocations.forEach(location => {
+                delete location.images.picture;
+                location.geotag = { type: "Point", coordinates: [ location.geotag.long, location.geotag.lat ] }
+            });
             collection.insertMany(newLocations).then(succ => {
                 console.log(succ);
                 db.close();
@@ -44,7 +47,8 @@ MongoClient.connect(url, function (err, db) {
 
 var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
     if(idx >= maxlength) {
-        console.log('all images streamed');
+        console.log('all images streamed', arr[0].images);
+
         return callback(arr);
     }
 
@@ -73,18 +77,18 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
     }
 
     streaming(filenameFromTitle, ext, xlargePath, arr, idx, maxlength, 'xlarge')
-        .then(() => {
-            return streaming(filenameFromTitle, ext, largePath, arr, idx, maxlength, 'large')
+        .then((newArray) => {
+            return streaming(filenameFromTitle, ext, largePath, newArray, idx, maxlength, 'large')
         })
-        .then(() => {
-            return streaming(filenameFromTitle, ext, normalPath, arr, idx, maxlength, 'normal')
+        .then((newArray) => {
+            return streaming(filenameFromTitle, ext, normalPath, newArray, idx, maxlength, 'normal')
         })
-        .then(() => {
-            return streaming(filenameFromTitle, ext, smallPath, arr, idx, maxlength, 'small')
+        .then((newArray) => {
+            return streaming(filenameFromTitle, ext, smallPath, newArray, idx, maxlength, 'small')
         })
-        .then(() => {
+        .then((newArray) => {
             idx++;
-            return insertImageAndDecorateObject(arr, idx, maxlength, callback);
+            return insertImageAndDecorateObject(newArray, idx, maxlength, callback);
         });
 
 };
@@ -100,7 +104,7 @@ function streaming(filenameFromTitle, ext, path, arr, idx, maxlength, objectProp
         let largewritestream = gfs.createWriteStream({
             filename: fullFileName
         });
-        console.time(fullFileName + '(' + objectPropertyName + ')');
+        console.time(fullFileName + ' (' + objectPropertyName + ')');
         request.get(path).pipe(largewritestream);
 
 
