@@ -10,12 +10,12 @@ var databaseInstance = {};
 
 const url = 'mongodb://localhost:27017/locator';
 
-MongoClient.connect(url, function(err, db) {
+MongoClient.connect(url, (err, db) => {
     databaseInstance = db;
 
     let collection = db.collection('users');
 
-    fse.readJson('./olddata/users.json', function (err, packageObj) {
+    fse.readJson('./olddata/users.json', (err, packageObj) => {
         let transformedUsers = [];
         packageObj.forEach(elem => {
             delete elem._rev;
@@ -39,7 +39,7 @@ MongoClient.connect(url, function(err, db) {
 });
 
 
-function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
+var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
 
     let user = arr[idx];
 
@@ -67,11 +67,11 @@ function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
     request.get(imgPath).pipe(writestream);
 
 
-    writestream.on('close', function (file) {
+    writestream.on('close', file => {
         // do something with `file`
         console.log('fileid', file._id);
         arr[idx].picture = '/api/v1/users/' + file._id + '/profile.jpeg';
-        if(idx >= maxlength - 1) {
+        if (idx >= maxlength - 1) {
             console.log('done with streaming');
             return callback(arr);
         }
@@ -80,9 +80,9 @@ function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
     });
 
 
-    writestream.on('error', function (file) {
+    writestream.on('error', err => {
         console.log('An error occurred!', err);
         throw err;
     });
 
-}
+};

@@ -41,7 +41,8 @@ const trips = allData.rows.filter(elem => {
 
 const messages = allData.rows.filter(elem => {
     let mess = elem.doc;
-    return mess.type === 'message' && !mess.message.startsWith('Herzlich Willkommen im Chat von Locator') && !mess.message.startsWith('Übrigens:') && !mess.message.startsWith('Wenn du uns Feedback');
+    return mess.type === 'message' && !mess.message.startsWith('Herzlich Willkommen im Chat von Locator') &&
+        !mess.message.startsWith('Übrigens:') && !mess.message.startsWith('Wenn du uns Feedback');
 }).map(elem => {
     return elem.doc;
 });
