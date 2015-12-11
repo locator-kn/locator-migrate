@@ -13,7 +13,7 @@ const url = 'mongodb://localhost:27017/locator';
 MongoClient.connect(url, function(err, db) {
     databaseInstance = db;
 
-    let collection = db.collection('userTest2');
+    let collection = db.collection('users');
 
     fse.readJson('./olddata/users.json', function (err, packageObj) {
         let transformedUsers = [];
