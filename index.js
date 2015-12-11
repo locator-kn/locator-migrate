@@ -22,14 +22,14 @@ wsLocations.on('error', err => {
 });
 const locations = allData.rows.filter(elem => {
     let loc = elem.doc;
-    return loc.type === 'location' && !loc.preLocation;
+    return loc.type === 'location' && !loc.preLocation  && !loc.delete;
 }).map(elem => {
     return elem.doc;
 });
 
 const prelocations = allData.rows.filter(elem => {
     let loc = elem.doc;
-    return loc.type === 'location' && loc.preLocation;
+    return loc.type === 'location' && loc.preLocation && !loc.delete;
 }).map(elem => {
     return elem.doc;
 });
