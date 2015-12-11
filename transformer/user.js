@@ -35,9 +35,6 @@ MongoClient.connect(url, function(err, db) {
                 console.error(err);
             });
         });
-        return
-
-        //console.log(packageObj) // => 0.1.3
     });
 });
 
