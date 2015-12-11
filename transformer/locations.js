@@ -28,9 +28,9 @@ MongoClient.connect(url, function (err, db) {
             transformedUsers.push(elem);
         });
 
-        insertImageAndDecorateObject(packageObj, 0, packageObj.length, newUser => {
+        insertImageAndDecorateObject(packageObj, 0, packageObj.length, newLocations => {
 
-            collection.insertMany(newUser).then(succ => {
+            collection.insertMany(newLocations).then(succ => {
                 console.log(succ);
                 db.close();
             }).catch(err => {
@@ -43,17 +43,19 @@ MongoClient.connect(url, function (err, db) {
 
 
 var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
+    if(idx >= maxlength) {
+        console.log('all images streamed');
+        return callback(arr);
+    }
 
     let location = arr[idx];
 
-    //console.log('user.title:', user);
     let filenameFromTitle = replaceIllegalChars(sanitize(location.title));
-    console.log('inserting:', filenameFromTitle);
 
     let base = location.images.picture || '';
     let xlargePath = '';
     let largePath = '';
-    let midPath = '';
+    let normalPath = '';
     let smallPath = '';
     let ext = '';
     if (!base.length || base.startsWith('http')) {
@@ -65,48 +67,52 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
         let basePath = 'https://locator-app.com' + base;
         xlargePath = basePath + '?size=max';
         largePath = basePath + '?size=mid';
-        midPath = basePath + '?size=small';
+        normalPath = basePath + '?size=small';
         smallPath = basePath + '?size=mobileThumb';
         ext = location.images.picture.split('.')[1];
     }
 
-    console.log('streaming img:', xlargePath);
-
-
-    let gfs = Grid(databaseInstance, mongo);
-
-    let writestream = gfs.createWriteStream({
-        filename: filenameFromTitle + '.' + ext
-    });
-
-    // get normal picture
-    request.get(xlargePath).pipe(writestream);
-
-
-    writestream.on('close', file => {
-        // do something with `file`
-        console.log('xlarge streamed successful', file._id);
-        arr[idx].images.xlarge = '/api/v1/locations/' + file._id + '/'+ filenameFromTitle + ext;
-
-
-        // stream thumbnail picture
-        let largewritestream = gfs.createWriteStream({
-            filename: filenameFromTitle + '.' + ext
+    streaming(filenameFromTitle, ext, xlargePath, arr, idx, maxlength, 'xlarge')
+        .then(() => {
+            return streaming(filenameFromTitle, ext, largePath, arr, idx, maxlength, 'large')
+        })
+        .then(() => {
+            return streaming(filenameFromTitle, ext, normalPath, arr, idx, maxlength, 'normal')
+        })
+        .then(() => {
+            return streaming(filenameFromTitle, ext, smallPath, arr, idx, maxlength, 'small')
+        })
+        .then(() => {
+            idx++;
+            return insertImageAndDecorateObject(arr, idx, maxlength, callback);
         });
-        request.get(largePath).pipe(largewritestream);
+
+};
+
+function streaming(filenameFromTitle, ext, path, arr, idx, maxlength, objectPropertyName) {
+    return new Promise((resolve, reject) => {
+
+        let gfs = Grid(databaseInstance, mongo);
+
+        let fullFileName = filenameFromTitle + ext;
+
+        // stream picture
+        let largewritestream = gfs.createWriteStream({
+            filename: fullFileName
+        });
+        console.time(fullFileName + '(' + objectPropertyName + ')');
+        request.get(path).pipe(largewritestream);
 
 
         largewritestream.on('close', file => {
-            console.log('large streamed successful', file._id);
 
-            arr[idx].images.large = '/api/v1/locations/' + file._id + '/' + filenameFromTitle + ext;
+            console.log('size:', objectPropertyName);
+            console.timeEnd(fullFileName + ' (' + objectPropertyName + ')');
+            //console.log(fullFileName, 'streamed successful', file._id);
 
-            if (idx >= maxlength - 1) {
-                console.log('done with streaming');
-                return callback(arr);
-            }
-            idx++;
-            return insertImageAndDecorateObject(arr, idx, maxlength, callback);
+            arr[idx].images[objectPropertyName] = '/api/v1/locations/' + file._id + '/' + filenameFromTitle + ext;
+
+            return resolve(arr);
         });
 
         largewritestream.on('error', err => {
@@ -114,14 +120,7 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
             throw err;
         });
     });
-
-
-    writestream.on('error', err => {
-        console.log('Error streaming picture in database', err);
-        throw err;
-    });
-
-};
+}
 
 function replaceIllegalChars(string)
 {
