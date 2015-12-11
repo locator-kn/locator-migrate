@@ -6,7 +6,7 @@ const Grid = require('gridfs-stream');
 const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 
-var databaseInstance = {}
+var databaseInstance = {};
 
 const url = 'mongodb://localhost:27017/test22';
 
