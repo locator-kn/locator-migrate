@@ -15,7 +15,12 @@ MongoClient.connect(url, (err, db) => {
 
     let collection = db.collection('users');
 
-    fse.readJson('./olddata/users.json', (err, packageObj) => {
+    fse.readJson('./../olddata/users.json', (err, packageObj) => {
+
+        if (err) {
+            console.log('Error reading user files', err);
+            throw err;
+        }
         let transformedUsers = [];
         packageObj.forEach(elem => {
             delete elem._rev;
