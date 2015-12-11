@@ -80,7 +80,7 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
 
         // stream thumbnail picture
         let thumbwritestream = gfs.createWriteStream({
-            filename: 'profile.' + ext
+            filename: 'profileThumb.' + ext
         });
         request.get(thumbPath).pipe(thumbwritestream);
 
