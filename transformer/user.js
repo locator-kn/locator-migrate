@@ -27,18 +27,18 @@ MongoClient.connect(url, function(err, db) {
 
         insertImageAndDecorateObject(packageObj, 0, packageObj.length, newUser => {
 
-            console.log('packageObj', packageObj[0]);
+            console.log('packageObj', newUser);
             return;
+            //console.log(transformedUsers)
+            collection.insertMany(newUser).then(succ => {
+                console.log(succ);
+                db.close();
+            }).catch(err => {
+                db.close();
+                console.error(err);
+            });
         });
         return
-        //console.log(transformedUsers)
-        collection.insertMany(transformedUsers).then(succ => {
-            console.log(succ);
-            db.close();
-        }).catch(err => {
-            db.close();
-            console.error(err);
-        });
 
         //console.log(packageObj) // => 0.1.3
     });
@@ -49,13 +49,13 @@ function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
 
     let user = arr[idx];
 
+    console.log('user.picture:', user.picture);
+
     let gfs = Grid(databaseInstance, mongo);
 
     let writestream = gfs.createWriteStream({
         filename: 'profile.jpeg'
     });
-
-    console.log('user.picture:', user.picture);
 
     let imgPath = user.picture || '';
     if (!imgPath.length || imgPath.startsWith('http')) {
@@ -64,7 +64,8 @@ function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
         return insertImageAndDecorateObject(arr, idx, maxlength, callback);
 
     } else {
-        imgPath = 'https://locator-app.com' + user.picture;
+        // TODO use maximum image size
+        imgPath = 'https://locator-app.com' + user.picture + '';
     }
 
     console.log('streaming img:', imgPath);
@@ -75,7 +76,7 @@ function insertImageAndDecorateObject(arr, idx, maxlength, callback) {
     writestream.on('close', function (file) {
         // do something with `file`
         console.log('fileid', file._id);
-        arr[idx].profile = '/api/v1/users/' + file._id + '/profile.jpeg';
+        arr[idx].picture = '/api/v1/users/' + file._id + '/profile.jpeg';
         if(idx >= maxlength - 1) {
             console.log('done with streaming');
             return callback(arr);
