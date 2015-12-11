@@ -27,9 +27,6 @@ MongoClient.connect(url, function(err, db) {
 
         insertImageAndDecorateObject(packageObj, 0, packageObj.length, newUser => {
 
-            console.log('packageObj', newUser);
-            return;
-            //console.log(transformedUsers)
             collection.insertMany(newUser).then(succ => {
                 console.log(succ);
                 db.close();
