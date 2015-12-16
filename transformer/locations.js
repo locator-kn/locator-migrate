@@ -24,6 +24,7 @@ MongoClient.connect(url, function (err, db) {
             delete elem._rev;
             delete elem.type;
             delete elem._attachments;
+            elem.categories = [];
 
             transformedUsers.push(elem);
         });
