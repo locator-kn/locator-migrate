@@ -16,19 +16,36 @@ const url = 'mongodb://localhost:27017/locator';
 MongoClient.connect(url, function (err, db) {
     databaseInstance = db;
 
-    let collection = db.collection('messages');
+    let collection = db.collection('conversations');
 
-    fse.readJson('./olddata/messages.json', function (err, packageObj) {
+    fse.readJson('./olddata/conversations.json', function (err, packageObj) {
+
+
+
         packageObj.forEach(elem => {
             delete elem._rev;
             delete elem.type;
-            delete elem._attachments;
-            delete elem.to;
-            delete elem.create_date;
 
-            elem.message_type = 'text';
+            delete elem[elem.user_1 + '_read'];
+            delete elem[elem.user_2 + '_read'];
+            //delete elem.create_date;
+
+            elem.participants = [];
+            elem.participants.push({
+                'user_id': elem.user_1,
+                'last_read': 0
+            });
+            elem.participants.push({
+                'user_id': elem.user_2,
+                'last_read': 0
+            });
+
+            delete elem.user_1;
+            delete elem.user_2;
+
 
         });
+
 
         collection.insertMany(packageObj).then(succ => {
             console.log(succ);
