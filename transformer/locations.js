@@ -25,6 +25,8 @@ MongoClient.connect(url, function (err, db) {
             delete elem.type;
             delete elem._attachments;
             elem.categories = [];
+            elem.favorites = elem.schoenhiers;
+            delete elem.schoenhiers;
 
             transformedUsers.push(elem);
         });
