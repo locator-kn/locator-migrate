@@ -18,34 +18,46 @@ MongoClient.connect(url, function (err, db) {
 
     let collection = db.collection('messages');
     fse.readJson('./olddata/userIdMapping.json', (err, userIdMappings) => {
-        if(err) {
+        if (err) {
             throw err;
         }
 
-        fse.readJson('./olddata/messages.json', function (err, packageObj) {
-            packageObj.forEach(elem => {
-                delete elem._rev;
-                delete elem.type;
-                delete elem._attachments;
-                delete elem.to;
-                delete elem.create_date;
-                delete elem._id;
-                userIdMappings.forEach(idObject => {
-                    if(elem.from === idObject.oldId) {
-                        elem.from = idObject.newId;
-                    }
+        fse.readJson('./olddata/conversationIdMapping.json', (err, conversationIdMapping) => {
+            if (err) {
+                throw err;
+            }
+
+            fse.readJson('./olddata/messages.json', function (err, packageObj) {
+                packageObj.forEach(elem => {
+                    delete elem._rev;
+                    delete elem.type;
+                    delete elem._attachments;
+                    delete elem.to;
+                    delete elem.create_date;
+                    delete elem._id;
+                    userIdMappings.forEach(idObject => {
+                        if (elem.from === idObject.oldId) {
+                            elem.from = idObject.newId;
+                        }
+                    });
+
+                    conversationIdMapping.forEach(idObject => {
+                        if (elem.conversation_id === idObject.oldId) {
+                            elem.conversation_id = idObject.newId;
+                        }
+                    });
+
+                    elem.message_type = 'text';
+
                 });
 
-                elem.message_type = 'text';
-
-            });
-
-            collection.insertMany(packageObj).then(succ => {
-                console.log(succ);
-                db.close();
-            }).catch(err => {
-                db.close();
-                console.error(err);
+                collection.insertMany(packageObj).then(succ => {
+                    console.log(succ);
+                    db.close();
+                }).catch(err => {
+                    db.close();
+                    console.error(err);
+                });
             });
         });
     });
