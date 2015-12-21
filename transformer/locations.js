@@ -29,14 +29,22 @@ MongoClient.connect(url, function (err, db) {
                 delete elem._rev;
                 delete elem.type;
                 delete elem._attachments;
+
+                // lets get a new id by mongodb
                 delete elem._id;
+
+                // rewrite old userid with new one
+                // the userid property has been renamed from userid to user_id
                 userIdMappings.forEach(idObject => {
                     if(elem.userid === idObject.oldId) {
                         delete elem.userid;
                         elem.user_id = idObject.newId;
                     }
                 });
+                // create empty array for upcomming categories
                 elem.categories = [];
+
+                // rename schoenhiers to favorites
                 elem.favorites = elem.schoenhiers || 0;
                 delete elem.schoenhiers;
 
