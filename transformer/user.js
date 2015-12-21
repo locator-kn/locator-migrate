@@ -21,20 +21,28 @@ MongoClient.connect(url, (err, db) => {
             console.log('Error reading user files', err);
             throw err;
         }
+        let userIds = [];
         let transformedUsers = [];
         packageObj.forEach(elem => {
             delete elem._rev;
             delete elem.type;
             delete elem._attachments;
-
+            userIds.push({oldId: elem._id});
+            delete elem._id;
             transformedUsers.push(elem);
         });
 
         insertImageAndDecorateObject(packageObj, 0, packageObj.length, newUser => {
 
             collection.insertMany(newUser).then(succ => {
-                console.log(succ);
-                db.close();
+                console.log(succ.insertedIds);
+                succ.insertedIds.forEach((id, idx) => {
+                   userIds[idx].newId = id;
+                });
+                fse.writeJson('./olddata/userIdMapping.json', userIds, (err, data) => {
+                    console.log(err || data);
+                    db.close();
+                });
             }).catch(err => {
                 db.close();
                 console.error(err);
