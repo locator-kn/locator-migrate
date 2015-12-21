@@ -20,6 +20,7 @@ MongoClient.connect(url, function (err, db) {
 
     fse.readJson('./olddata/userIdMapping.json', (err, userIdMappings) => {
         if (err) {
+            console.error('pls create users first by running node transformers/user.js');
             throw err;
         }
 
