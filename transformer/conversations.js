@@ -17,51 +17,69 @@ MongoClient.connect(url, function (err, db) {
     databaseInstance = db;
 
     let collection = db.collection('conversations');
+    fse.readJson('./olddata/userIdMapping.json', (err, userIdMappings) => {
+        if (err) {
+            throw err;
+        }
+        fse.readJson('./olddata/conversations.json', function (err, packageObj) {
 
-    fse.readJson('./olddata/conversations.json', function (err, packageObj) {
+            let conversationIds = [];
+
+            packageObj.forEach(elem => {
+                delete elem._rev;
+                delete elem.type;
+
+                conversationIds.push({oldId: elem._id});
+                delete elem._id;
+
+                delete elem[elem.user_1 + '_read'];
+                delete elem[elem.user_2 + '_read'];
+                //delete elem.create_date;
+
+                elem.participants = [];
+                userIdMappings.forEach(userObj => {
+                    if (elem.user_1 === userObj.oldId) {
+                        elem.user_1 = userObj.newId;
+                    }
+                    if (elem.user_2 === userObj.oldId) {
+                        elem.user_2 = userObj.newId;
+                    }
+                });
+                elem.participants.push({
+                    'user_id': elem.user_1,
+                    'last_read': 0
+                });
+                elem.participants.push({
+                    'user_id': elem.user_2,
+                    'last_read': 0
+                });
+
+                delete elem.user_1;
+                delete elem.user_2;
 
 
-
-        packageObj.forEach(elem => {
-            delete elem._rev;
-            delete elem.type;
-
-            delete elem[elem.user_1 + '_read'];
-            delete elem[elem.user_2 + '_read'];
-            //delete elem.create_date;
-
-            elem.participants = [];
-            elem.participants.push({
-                'user_id': elem.user_1,
-                'last_read': 0
             });
-            elem.participants.push({
-                'user_id': elem.user_2,
-                'last_read': 0
+
+
+            collection.insertMany(packageObj).then(succ => {
+                //console.log(succ);
+                succ.insertedIds.forEach((id, idx) => {
+                    conversationIds[idx].newId = id;
+                });
+                fse.writeJson('./olddata/conversationIdMapping.json', conversationIds, (err, data) => {
+                    console.log(err || data);
+                    db.close();
+                });
+            }).catch(err => {
+                db.close();
+                console.error(err);
             });
-
-            delete elem.user_1;
-            delete elem.user_2;
-
-
-        });
-
-
-        collection.insertMany(packageObj).then(succ => {
-            console.log(succ);
-            db.close();
-        }).catch(err => {
-            db.close();
-            console.error(err);
         });
     });
 });
 
 
-
-
-function replaceIllegalChars(string)
-{
+function replaceIllegalChars(string) {
     let value = string.toLowerCase();
     value = value.replace(/ä/g, 'ae');
     value = value.replace(/ö/g, 'oe');
