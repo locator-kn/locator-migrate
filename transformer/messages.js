@@ -19,11 +19,14 @@ MongoClient.connect(url, function (err, db) {
     let collection = db.collection('messages');
     fse.readJson('./olddata/userIdMapping.json', (err, userIdMappings) => {
         if (err) {
+            console.error('pls create users first by running node transformers/user.js');
             throw err;
         }
 
         fse.readJson('./olddata/conversationIdMapping.json', (err, conversationIdMapping) => {
             if (err) {
+
+                console.error('pls create conversations first by running node transformers/conversations.js');
                 throw err;
             }
 
