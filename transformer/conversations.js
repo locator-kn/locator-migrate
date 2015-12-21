@@ -19,10 +19,15 @@ MongoClient.connect(url, function (err, db) {
     let collection = db.collection('conversations');
     fse.readJson('./olddata/userIdMapping.json', (err, userIdMappings) => {
         if (err) {
+            console.error('pls create users first by running node transformers/user.js');
             throw err;
         }
-        fse.readJson('./olddata/conversations.json', function (err, packageObj) {
 
+        fse.readJson('./olddata/conversations.json', function (err, packageObj) {
+            if(err) {
+                console.error('pls split up documents first by running node index.js');
+                throw err;
+            }
             let conversationIds = [];
 
             packageObj.forEach(elem => {

@@ -17,10 +17,11 @@ MongoClient.connect(url, (err, db) => {
 
     fse.readJson('./olddata/users.json', (err, packageObj) => {
 
-        if (err) {
-            console.log('Error reading user files', err);
+        if(err) {
+            console.error('pls split up documents first by running node index.js');
             throw err;
         }
+
         let userIds = [];
         let transformedUsers = [];
         packageObj.forEach(elem => {

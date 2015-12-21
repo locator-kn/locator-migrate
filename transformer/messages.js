@@ -31,6 +31,10 @@ MongoClient.connect(url, function (err, db) {
             }
 
             fse.readJson('./olddata/messages.json', function (err, packageObj) {
+                if(err) {
+                    console.error('pls split up documents first by running node index.js');
+                    throw err;
+                }
                 packageObj.forEach(elem => {
                     delete elem._rev;
                     delete elem.type;

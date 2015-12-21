@@ -11,8 +11,13 @@ const wsConversations = fs.createWriteStream('./olddata/conversations.json');
 const wsSchoenhiers = fs.createWriteStream('./olddata/schoenhiers.json');
 //const wsImage = fs.createWriteStream('./image.jpeg');
 
-
-const allData = require('./allData.json');
+try {
+    const allData = require('./allData.json');
+} catch(e) {
+    console.log('pls create allData.json with all documents from couchdb first');
+    console.log('with VPN: http://locator.in.htwg-konstanz.de:5984/app/_all_docs?include_docs=true');
+    process.exit();
+}
 
 console.log('total elements', allData.total_rows);
 //console.log(allData.rows[0]);
