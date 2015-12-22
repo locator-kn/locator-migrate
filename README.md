@@ -1,5 +1,7 @@
 # locator-migrate
 
+Lead Maintainer: [Timo Weiß](https://github.com/timoweiss)
+
 this repo contains code to migrate the data for [locator-app.com](https://locator-app.com) from couchdb to mongodb.
 
 ## What to do?
