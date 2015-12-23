@@ -56,7 +56,7 @@ MongoClient.connect(url, function (err, db) {
                 transformedUsers.push(elem);
             });
 
-            insertImageAndDecorateObject(packageObj, 0, 5, newLocations => {
+            insertImageAndDecorateObject(packageObj, 0, packageObj.length, newLocations => {
                 newLocations.forEach(location => {
                     delete location.images.picture;
                     location.geotag = {type: "Point", coordinates: [location.geotag.long, location.geotag.lat]}
