@@ -50,7 +50,7 @@ MongoClient.connect(url, function (err, db) {
                 elem.categories = [];
 
                 // rename schoenhiers to favorites
-                elem.favorites = elem.schoenhiers || 0;
+                elem.favorites = [];
                 delete elem.schoenhiers;
 
                 transformedUsers.push(elem);
