@@ -28,6 +28,7 @@ MongoClient.connect(url, (err, db) => {
             delete elem._rev;
             delete elem.type;
             delete elem._attachments;
+            delete elem.defaultLocation;
             userIds.push({oldId: elem._id});
             delete elem._id;
             transformedUsers.push(elem);
