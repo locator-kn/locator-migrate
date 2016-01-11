@@ -31,6 +31,7 @@ MongoClient.connect(url, (err, db) => {
             delete elem.defaultLocation;
             userIds.push({oldId: elem._id});
             delete elem._id;
+            delete elem.isAdmin;
             transformedUsers.push(elem);
         });
 
