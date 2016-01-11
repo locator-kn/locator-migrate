@@ -90,7 +90,7 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
     writestream.on('close', file => {
         // do something with `file`
         console.log('picture streamed successful', file._id);
-        arr[idx].picture = '/api/v1/users/' + file._id + '/profile.' + ext;
+        arr[idx].picture = '/api/v2/users/' + file._id + '/profile.' + ext;
 
 
         // stream thumbnail picture
@@ -103,7 +103,7 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
         thumbwritestream.on('close', file => {
             console.log('thumb streamed successful', file._id);
 
-            arr[idx].thumb = '/api/v1/users/' + file._id + '/profileThumb.' + ext;
+            arr[idx].thumb = '/api/v2/users/' + file._id + '/profileThumb.' + ext;
 
             if (idx >= maxlength - 1) {
                 console.log('done with streaming');
