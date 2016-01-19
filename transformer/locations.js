@@ -143,7 +143,7 @@ function streaming(filenameFromTitle, ext, path, arr, idx, maxlength, objectProp
             console.timeEnd(fullFileName + ' (' + objectPropertyName + ')');
             //console.log(fullFileName, 'streamed successful', file._id);
 
-            arr[idx].images[objectPropertyName] = '/api/v2/file/' + file._id + '/' + filenameFromTitle + ext;
+            arr[idx].images[objectPropertyName] = '/api/v2/locations/impression/image/' + file._id + '/' + filenameFromTitle + ext;
 
             return resolve(arr);
         });
