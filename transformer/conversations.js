@@ -24,7 +24,7 @@ MongoClient.connect(url, function (err, db) {
         }
 
         fse.readJson('./olddata/conversations.json', function (err, packageObj) {
-            if(err) {
+            if (err) {
                 console.error('pls split up documents first by running node index.js');
                 throw err;
             }
@@ -77,7 +77,11 @@ MongoClient.connect(url, function (err, db) {
                 });
             }).catch(err => {
                 db.close();
-                console.error(err);
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log('Migration complete');
+                }
             });
         });
     });
