@@ -32,8 +32,17 @@ MongoClient.connect(url, (err, db) => {
             userIds.push({oldId: elem._id});
             delete elem._id;
             delete elem.isAdmin;
+            delete elem.verified;
+
+            if(elem.additionalInfo && elem.additionalInfo.provider === 'facebook') {
+                elem.fbId = elem.additionalInfo.profile.id;
+            }
+
+            delete elem.additionalInfo;
+
             transformedUsers.push(elem);
         });
+        //return console.log('user', JSON.stringify(transformedUsers[1]))
 
         insertImageAndDecorateObject(packageObj, 0, packageObj.length, newUser => {
 
