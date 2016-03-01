@@ -38,7 +38,7 @@ MongoClient.connect(url, function (err, db) {
                 // lets get a new id by mongodb
                 delete elem._id;
 
-                delete elem.description
+                delete elem.description;
 
                 // rewrite old userid with new one
                 // the userid property has been renamed from userid to user_id
