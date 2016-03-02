@@ -24,6 +24,7 @@ MongoClient.connect(url, (err, db) => {
 
         let userIds = [];
         let transformedUsers = [];
+        let googleUser = [];
         packageObj.forEach(elem => {
             delete elem._rev;
             delete elem.type;
@@ -37,12 +38,17 @@ MongoClient.connect(url, (err, db) => {
             if(elem.additionalInfo && elem.additionalInfo.provider === 'facebook') {
                 elem.fbId = elem.additionalInfo.profile.id;
             }
+            if(elem.strategy === 'google') {
+                //googleUser = [...googleUser, elem];
+                googleUser.push(elem);
+                return;
+            }
 
             delete elem.additionalInfo;
 
             transformedUsers.push(elem);
         });
-        //return console.log('user', JSON.stringify(transformedUsers[1]))
+        //return console.log('user', JSON.stringify(googleUser))
 
         insertImageAndDecorateObject(packageObj, 0, packageObj.length, newUser => {
 
