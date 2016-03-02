@@ -2,3 +2,4 @@ allData.json
 .idea/
 node_modules/
 *.log
+googleUsersToBeNotified.json
