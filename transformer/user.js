@@ -6,6 +6,9 @@ const Grid = require('gridfs-stream');
 const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 
+
+const googleUserStream = fse.createWriteStream('./googleUsersToBeNotified.json');
+
 var databaseInstance = {};
 
 const url = 'mongodb://localhost:27017/locator';
@@ -49,6 +52,8 @@ MongoClient.connect(url, (err, db) => {
             transformedUsers.push(elem);
         });
         //return console.log('user', JSON.stringify(googleUser))
+        googleUserStream.write(JSON.stringify(googleUser));
+        googleUserStream.end();
 
         insertImageAndDecorateObject(packageObj, 0, packageObj.length, newUser => {
 
