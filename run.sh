@@ -21,3 +21,10 @@ node transformer/conversations.js
 
 echo "\n creating messages"
 node transformer/messages.js
+
+
+echo "\n\n all done, doing some cleanup"
+cd olddata/ && rm -rf * && cd -
+
+echo "\n bye bye"
+
