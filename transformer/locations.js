@@ -168,6 +168,7 @@ function replaceIllegalChars(string) {
     value = value.replace(/\(/g, '_');
     value = value.replace(/\)/g, '_');
     value = value.replace(/ /g, '_');
+    value = value.replace(/´/g, '_');
     return value + '.';
 }
 /*
