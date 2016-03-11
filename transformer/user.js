@@ -33,6 +33,8 @@ MongoClient.connect(url, (err, db) => {
             delete elem.type;
             delete elem._attachments;
             delete elem.defaultLocation;
+            delete elem.resetPasswordToken;
+            delete elem.resetPasswordExpires;
             userIds.push({oldId: elem._id});
             delete elem._id;
             delete elem.isAdmin;
@@ -104,6 +106,7 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
         filename: 'profile.' + ext
     });
 
+    arr[idx].images = {};
     // get normal picture
     request.get(imgPath).pipe(writestream);
 
@@ -111,7 +114,7 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
     writestream.on('close', file => {
         // do something with `file`
         console.log('picture streamed successful', file._id);
-        arr[idx].picture = '/api/v2/users/image/' + file._id + '/profile.' + ext;
+        arr[idx].images.normal = '/api/v2/users/image/' + file._id + '/profile.' + ext;
 
 
         // stream thumbnail picture
@@ -124,7 +127,7 @@ var insertImageAndDecorateObject = (arr, idx, maxlength, callback)=> {
         thumbwritestream.on('close', file => {
             console.log('thumb streamed successful', file._id);
 
-            arr[idx].thumb = '/api/v2/users/image/' + file._id + '/profileThumb.' + ext;
+            arr[idx].images.small = '/api/v2/users/image/' + file._id + '/profileThumb.' + ext;
 
             if (idx >= maxlength - 1) {
                 console.log('done with streaming');
