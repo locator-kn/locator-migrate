@@ -104,8 +104,6 @@ wsSchoenhiers.write(JSON.stringify(schoenhiers));
 wsSchoenhiers.end();
 
 
-//request.get('https://locator-app.com/api/v1/locations/90dd0bb7f23c628dddf94ba236ed5e25/supertrip.jpeg').pipe(wsImage)
-
 console.timeEnd('locations filter');
 console.log('locations:', locations.length);
 console.log('prelocations:', prelocations.length);
