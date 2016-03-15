@@ -17,6 +17,7 @@ MongoClient.connect(url, function (err, db) {
     databaseInstance = db;
 
     let collection = db.collection('locations');
+    let privateCollection = db.collection('privateLocations');
 
     fse.readJson('./olddata/userIdMapping.json', (err, userIdMappings) => {
         if (err) {
@@ -25,12 +26,17 @@ MongoClient.connect(url, function (err, db) {
         }
 
         fse.readJson('./olddata/locations.json', function (err, packageObj) {
-            if(err) {
+            if (err) {
                 console.error('pls split up documents first by running node index.js');
                 throw err;
             }
             let transformedUsers = [];
             packageObj.forEach(elem => {
+
+                if (elem.private) {
+                    return;
+                }
+
                 delete elem._rev;
                 delete elem.type;
                 delete elem._attachments;
@@ -43,7 +49,7 @@ MongoClient.connect(url, function (err, db) {
                 // rewrite old userid with new one
                 // the userid property has been renamed from userid to user_id
                 userIdMappings.forEach(idObject => {
-                    if(elem.userid === idObject.oldId) {
+                    if (elem.userid === idObject.oldId) {
                         delete elem.userid;
                         elem.user_id = idObject.newId;
                     }
