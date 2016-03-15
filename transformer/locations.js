@@ -5,9 +5,36 @@ const request = require('request');
 const Grid = require('gridfs-stream');
 const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 
 const sanitize = require("sanitize-filename");
 
+let uploadDefaultPicture = (id, db)=> {
+
+    let gfs = Grid(db, mongo);
+
+    let fullFileName = 'default.jpg';
+
+    // stream picture
+    let defaultWriteStream = gfs.createWriteStream({
+        _id: id,
+        filename: fullFileName
+    });
+
+    console.log('streaming default location image');
+
+    fse.createReadStream('default.jpg').pipe(defaultWriteStream);
+
+
+    defaultWriteStream.on('close', file => {
+        console.log('succesful upload of default image')
+    });
+
+    defaultWriteStream.on('error', err => {
+        console.log('Error streaming default in database', err);
+        throw err;
+    });
+};
 
 var databaseInstance = {};
 
@@ -16,8 +43,11 @@ const url = 'mongodb://localhost:27017/locator';
 MongoClient.connect(url, function (err, db) {
     databaseInstance = db;
 
+    let defaultId = new ObjectID();
+
+    uploadDefaultPicture(defaultId, databaseInstance);
+
     let collection = db.collection('locations');
-    let privateCollection = db.collection('privateLocations');
 
     fse.readJson('./olddata/userIdMapping.json', (err, userIdMappings) => {
         if (err) {
@@ -33,8 +63,18 @@ MongoClient.connect(url, function (err, db) {
             let transformedUsers = [];
             packageObj.forEach(elem => {
 
-                if (elem.private) {
+                if (!elem.public) {
                     return;
+                }
+
+                if (!elem.images.picture) {
+                    // set default picture
+                    elem.images = {
+                        xlarge: '/api/v2/locations/impression/image/' + defaultId + '/image.jpg',
+                        large: '/api/v2/locations/impression/image/' + defaultId + '/image.jpg',
+                        normal: '/api/v2/locations/impression/image/' + defaultId + '/image.jpg',
+                        small: '/api/v2/locations/impression/image/' + defaultId + '/image.jpg'
+                    };
                 }
 
                 delete elem._rev;
