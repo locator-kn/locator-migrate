@@ -61,11 +61,11 @@ MongoClient.connect(url, function (err, db) {
                 throw err;
             }
             let transformedUsers = [];
-            packageObj = packageObj.forEach(elem => {
+            packageObj = packageObj.filter(elem => {
 
-                /*if (!elem.public) {
+                if (!elem.public) {
                     return false;
-                }*/
+                }
 
                 if (!elem.images.picture) {
                     // set default picture
@@ -102,6 +102,7 @@ MongoClient.connect(url, function (err, db) {
                 delete elem.schoenhiers;
 
                 transformedUsers.push(elem);
+                return true;
             });
 
             insertImageAndDecorateObject(packageObj, 0, packageObj.length, newLocations => {
